@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlatformType {
+  Download
+  Url
+}
+
+model User {
+  id       String    @id @default(uuid()) @db.Uuid
+  username String    @unique
+  email    String    @unique
+  password String
+  reviews  Review[]
+  games    Game[]    @relation("CreatedGames")
+  profile  Profile?
+}
+
+model Profile {
+  id     String @id @default(uuid()) @db.Uuid
+  image  String?
+  idUser String @unique @db.Uuid
+  user   User   @relation(fields: [idUser], references: [id], onDelete: Cascade) 
+}
+
+model Genre {
+  id    String  @id @default(uuid()) @db.Uuid
+  name  String
+  games Game[]
+}
+
+model Platform {
+  id   String       @id @default(uuid()) @db.Uuid
+  name String
+  type PlatformType
+  games Game[]
+}
+
+model Game {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String
+  gameUrl     String
+  coverImage  String
+  screenshots String
+  createdAt   DateTime @default(now())
+
+  // Foreign Keys
+
+  genreId     String @db.Uuid
+  genre       Genre    @relation(fields: [genreId], references: [id])
+
+  platformId  String @db.Uuid
+  platform    Platform @relation(fields: [platformId], references: [id])
+
+  createdById String @db.Uuid
+  createdBy   User     @relation("CreatedGames", fields: [createdById], references: [id])
+
+  reviews     Review[]
+}
+
+model Review {
+  id          String   @id @default(uuid()) @db.Uuid
+  rating      Int
+  comment     String
+  createdAt   DateTime @default(now())
+
+  // FK ke Game
+  gameId      String @db.Uuid
+  game        Game     @relation(fields: [gameId], references: [id])
+
+  // FK ke User
+  createdById String @db.Uuid
+  createdBy   User     @relation(fields: [createdById], references: [id])
+}
