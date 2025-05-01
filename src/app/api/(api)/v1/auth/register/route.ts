@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/shared/lib/helpers/server";
+import jwt from "jsonwebtoken";
 
 export async function POST(request: Request) {
   const { username, email, password } = await request.json();
@@ -26,19 +27,29 @@ export async function POST(request: Request) {
       profile: { create: {} },
     },
     include: {
-      profile: true, // agar data profile ikut dimuat
+      profile: true,
     },
   });
 
-  // Jangan kirim password ke client
   const { password: _, ...userWithoutPassword } = user;
 
-  console.log(_);
+  // Generate JWT token
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET as string, // simpan ini di .env
+    {
+      expiresIn: "7d",
+    }
+  );
 
   return NextResponse.json(
     {
       message: "User registered successfully",
       data: userWithoutPassword,
+      token, // dikirim ke client
     },
     { status: 201 }
   );

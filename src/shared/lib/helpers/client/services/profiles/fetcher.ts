@@ -7,7 +7,7 @@ import { IRequestPutProfile } from "../interfaces/profile.interfaces";
 
 export const getProfile = (activeFilter: activeFilter) => {
   const queryString = QueryString.parse(removeEmptyAttributes(activeFilter));
-  return api.get(`${ENDPOINT.Root}${ENDPOINT.Profiles}`, {
+  return api.get(`${ENDPOINT.Root}${ENDPOINT.User}${ENDPOINT.Profiles}`, {
     params: { ...queryString },
   });
 };
