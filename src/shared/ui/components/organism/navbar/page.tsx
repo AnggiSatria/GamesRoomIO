@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import { PasswordInput } from "../../atoms/PasswordInput";
 import { useReadProfiles } from "@/shared/lib/helpers/client/services/profiles";
 import Cookies from "js-cookie";
+import { Toaster } from "sonner";
 
 export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
@@ -30,35 +31,26 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const token = Cookies.get("token");
 
-  const {
-    form: formLogin,
-    onSubmit: onSubmitLogin,
-    loading: loadingMutationLogin,
-  } = useHooksLogin({ setShowLogin });
+  const { form: formLogin, onSubmit: onSubmitLogin } = useHooksLogin({
+    setShowLogin,
+  });
 
-  const {
-    form: formRegister,
-    onSubmit: onSubmitRegister,
-    loading: loadingMutationRegister,
-  } = useHooksRegister({ setShowRegister });
+  const { form: formRegister, onSubmit: onSubmitRegister } = useHooksRegister({
+    setShowRegister,
+  });
 
   const activeFilter = {
     search: "",
-    pagination: "",
+    page: "",
   };
 
-  const {
-    data: dataProfiles,
-    isSuccess,
-    isError,
-    refetch,
-    isLoading,
-  } = useReadProfiles(activeFilter);
+  const { data: dataProfiles } = useReadProfiles(activeFilter);
 
   const checkUsers = dataProfiles && dataProfiles?.data?.profile;
 
   return (
     <>
+      <Toaster />
       <Dialog open={showLogin} onOpenChange={setShowLogin}>
         <DialogContent className="bg-gray-900">
           <DialogHeader>

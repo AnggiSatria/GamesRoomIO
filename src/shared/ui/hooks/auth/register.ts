@@ -6,7 +6,6 @@ import { z } from "zod";
 import { IRequestPostRegisterUser } from "@/shared/lib/helpers/client/services/interfaces/user.interfaces";
 import { useReadProfiles } from "@/shared/lib/helpers/client/services/profiles";
 import { useCreateRegister } from "@/shared/lib/helpers/client/services/auth";
-import Cookies from "js-cookie";
 
 export default function useHooksRegister({
   setShowRegister,
@@ -17,7 +16,7 @@ export default function useHooksRegister({
 
   const activeFilter = {
     search: "",
-    pagination: "",
+    page: "",
   };
 
   const {
@@ -57,6 +56,7 @@ export default function useHooksRegister({
         refetch();
       }
       setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setLoading(false);
 

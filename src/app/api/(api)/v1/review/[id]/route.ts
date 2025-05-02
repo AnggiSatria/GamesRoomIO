@@ -1,6 +1,5 @@
-import { prisma } from "@/shared/lib/helpers/server";
+import { prisma } from "@/shared/lib/helpers/server/prisma";
 import { NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
 
 // GET /reviews/:id
 export async function GET(
@@ -18,9 +17,10 @@ export async function GET(
     if (!review)
       return NextResponse.json({ message: "Not Found" }, { status: 404 });
     return NextResponse.json(review);
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      // Handle known Prisma errors
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Menangani error Prisma berdasarkan error.code, bukan Prisma.PrismaClientKnownRequestError
+    if (error?.code) {
       return NextResponse.json({ message: error.message }, { status: 500 });
     }
     if (error instanceof Error) {
@@ -56,11 +56,10 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedReview);
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Menangani error Prisma berdasarkan error.code
+    if (error?.code === "P2025") {
       return NextResponse.json(
         { message: "Review not found" },
         { status: 404 }
@@ -92,11 +91,10 @@ export async function DELETE(
     return NextResponse.json({
       message: `Review with ID ${deletedReview.id} has been successfully deleted.`,
     });
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Menangani error Prisma berdasarkan error.code
+    if (error?.code === "P2025") {
       return NextResponse.json(
         { message: "Review not found" },
         { status: 404 }

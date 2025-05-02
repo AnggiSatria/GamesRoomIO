@@ -1,21 +1,34 @@
+"use client";
+
+import HeroSection from "@/shared/ui/components/molecules/hero";
+import SidebarFilter from "@/shared/ui/components/molecules/sidebarFilter";
+import GameList from "@/shared/ui/components/organism/listGame";
 import Navbar from "@/shared/ui/components/organism/navbar/page";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useState } from "react";
 
 export default function Home() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       {/* Navbar */}
       <Navbar />
-
       {/* Hero */}
-      <section className="flex flex-col items-center justify-center text-center py-24 px-4">
-        <h2 className="text-4xl md:text-6xl font-bold mb-6">
-          Play Anywhere with{" "}
-          <span className="text-purple-500">GamesRoom IO</span>
-        </h2>
-        <p className="text-lg md:text-xl max-w-xl mb-8 text-gray-300">
-          Your favorite games, no installation needed. Just click and play!
-        </p>
-      </section>
+      <HeroSection />
+      {/* List Game */}
+      <div className="flex w-full gap-3 xl:px-7 flex-col xl:flex-row">
+        <GameList search={debouncedSearchTerm} />
+        <SidebarFilter
+          onSearchChange={(val) => {
+            setSearchTerm(val);
+          }}
+          onPlatformChange={(platforms) => {
+            console.log(platforms);
+          }}
+        />
+      </div>
     </main>
   );
 }

@@ -13,7 +13,7 @@ export interface IRequestPutReview {
   createdById: string;
 }
 
-export interface IResponseGetReviews {
+export interface IResponseGetReviewList {
   id: string;
   rating: number;
   comment: string;
@@ -27,7 +27,8 @@ export interface IResponseGetReviews {
     username: string;
   };
 }
-[];
+
+export type IResponseGetReviews = IResponseGetReviewList[];
 
 export interface IResponseGetReviewById {
   id: string;

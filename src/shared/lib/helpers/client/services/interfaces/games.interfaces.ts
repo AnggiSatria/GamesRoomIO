@@ -28,7 +28,7 @@ export interface IResponseGetGameById {
   };
 }
 
-export interface IResponseGetGames {
+export interface IResponseGetGamesList {
   id: string;
   title: string;
   description: string;
@@ -46,7 +46,8 @@ export interface IResponseGetGames {
     type: "Download" | "Url";
   };
 }
-[];
+
+export type IResponseGetGames = IResponseGetGamesList[];
 
 export interface IRequestPutGame {
   id: string;

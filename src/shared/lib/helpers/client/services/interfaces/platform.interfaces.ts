@@ -15,9 +15,10 @@ export interface IResponseGetPlatformById {
   type: "Download" | "Url"; // berdasarkan enum PlatformType
 }
 
-export interface IResponseGetPlatforms {
+export interface IResponseGetPlatformList {
   id: string;
   name: string;
   type: "Download" | "Url"; // berdasarkan enum PlatformType
 }
-[];
+
+export type IResponseGetPlatforms = IResponseGetPlatformList[];

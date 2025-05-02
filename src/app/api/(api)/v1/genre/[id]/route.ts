@@ -1,7 +1,6 @@
 // /app/api/v1/genres/[id]/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
-import { Prisma } from "@prisma/client";
 
 // GET /genres/:id
 export async function GET(
@@ -10,15 +9,23 @@ export async function GET(
 ) {
   const { id } = await context.params;
 
-  const genre = await prisma.genre.findUnique({
-    where: { id },
-  });
+  try {
+    const genre = await prisma.genre.findUnique({
+      where: { id },
+    });
 
-  if (!genre) {
-    return NextResponse.json({ message: "Genre not found" }, { status: 404 });
+    if (!genre) {
+      return NextResponse.json({ message: "Genre not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(genre);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(genre);
 }
 
 // PUT /genres/:id
@@ -42,13 +49,13 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedGenre);
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Mengatasi error yang berasal dari Prisma
+    if (error?.code === "P2025") {
       return NextResponse.json({ message: "Genre not found" }, { status: 404 });
     }
+
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
@@ -72,13 +79,13 @@ export async function DELETE(
     return NextResponse.json({
       message: `Genre "${deletedGenre.name}" has been successfully deleted.`,
     });
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // Mengatasi error yang berasal dari Prisma
+    if (error?.code === "P2025") {
       return NextResponse.json({ message: "Genre not found" }, { status: 404 });
     }
+
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

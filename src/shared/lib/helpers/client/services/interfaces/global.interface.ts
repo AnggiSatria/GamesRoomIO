@@ -1,4 +1,4 @@
 export interface activeFilter {
   search: string;
-  pagination: string;
+  page: string;
 }

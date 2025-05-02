@@ -22,7 +22,22 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json(games);
+  const total = await prisma.game.count({
+    where: {
+      OR: [
+        { title: { contains: search || "", mode: "insensitive" } },
+        { description: { contains: search || "", mode: "insensitive" } },
+      ],
+    },
+  });
+
+  return NextResponse.json({
+    data: games,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalItems: total,
+  });
+  // return NextResponse.json(games);
 }
 
 export async function POST(request: Request) {

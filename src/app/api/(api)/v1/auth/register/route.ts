@@ -33,6 +33,8 @@ export async function POST(request: Request) {
 
   const { password: _, ...userWithoutPassword } = user;
 
+  console.log(_);
+
   // Generate JWT token
   const token = jwt.sign(
     {

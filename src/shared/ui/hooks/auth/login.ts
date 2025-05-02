@@ -16,7 +16,7 @@ export default function useHooksLogin({
 
   const activeFilter = {
     search: "",
-    pagination: "",
+    page: "",
   };
 
   const {
@@ -54,6 +54,7 @@ export default function useHooksLogin({
         refetch();
       }
       setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setLoading(false);
 

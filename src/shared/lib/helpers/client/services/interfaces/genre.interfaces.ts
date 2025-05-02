@@ -12,8 +12,9 @@ export interface IResponseGetGenreById {
   name: string;
 }
 
-export interface IResponseGetGenres {
+export interface IRequestPutGenreList {
   id: string;
   name: string;
 }
-[];
+
+export type IResponseGetGenres = IRequestPutGenreList[];
