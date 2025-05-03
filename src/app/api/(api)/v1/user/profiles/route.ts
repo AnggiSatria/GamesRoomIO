@@ -7,7 +7,7 @@ export async function OPTIONS(request: NextRequest) {
   return handleOptions(request);
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
