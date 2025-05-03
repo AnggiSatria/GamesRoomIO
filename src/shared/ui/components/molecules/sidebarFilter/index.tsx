@@ -23,8 +23,6 @@ export default function SidebarFilter({
 
   const platforms = dataPlatforms && dataPlatforms?.data;
 
-  console.log(dataPlatforms);
-
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
   const handleCheckboxChange = (id: string) => {

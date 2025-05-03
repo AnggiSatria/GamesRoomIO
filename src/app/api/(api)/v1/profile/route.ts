@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
 import { getToken } from "@/shared/lib/helpers/server/auth";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 export async function PUT(request: Request) {
   const token = await getToken(request);
   if (!token) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const res = NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return withCORS(res, request.headers.get("origin") ?? "*");
   }
 
   const { image } = await request.json();
@@ -16,5 +18,6 @@ export async function PUT(request: Request) {
     create: { idUser: token.userId, image },
   });
 
-  return NextResponse.json(profile);
+  const res = NextResponse.json(profile);
+  return withCORS(res, request.headers.get("origin") ?? "*");
 }

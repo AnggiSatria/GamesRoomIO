@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/shared/lib/helpers/server";
 import jwt from "jsonwebtoken";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 export async function POST(request: Request) {
   const { username, email, password } = await request.json();
@@ -11,10 +12,12 @@ export async function POST(request: Request) {
   });
 
   if (existingUser) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "User already exists" },
       { status: 400 }
     );
+
+    return withCORS(res, request.headers.get("origin") ?? "*");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,7 +50,7 @@ export async function POST(request: Request) {
     }
   );
 
-  return NextResponse.json(
+  const res = NextResponse.json(
     {
       message: "User registered successfully",
       data: userWithoutPassword,
@@ -55,4 +58,6 @@ export async function POST(request: Request) {
     },
     { status: 201 }
   );
+
+  return withCORS(res, request.headers.get("origin") ?? "*");
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/shared/lib/helpers/server";
 import { v2 as cloudinary } from "cloudinary";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -27,7 +28,8 @@ export async function POST(req: Request) {
     cookieStore.get("token")?.value ||
     req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const res = NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   let userId: string | undefined;
@@ -38,14 +40,19 @@ export async function POST(req: Request) {
     userId = decoded.userId;
   } catch (err) {
     console.error("JWT error:", err);
-    return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    const res = NextResponse.json(
+      { message: "Invalid token" },
+      { status: 401 }
+    );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   if (!userId) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "User ID not found in token" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   // ✅ Deteksi field yang kosong
@@ -58,13 +65,14 @@ export async function POST(req: Request) {
   if (!platformId) missingFields.push("platformId");
 
   if (missingFields.length > 0) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         message: "Missing required fields",
         missingFields,
       },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   // Verifikasi apakah Platform ada
@@ -73,10 +81,11 @@ export async function POST(req: Request) {
   });
 
   if (!platformExists) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: `Platform with ID ${platformId} not found` },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   // Verifikasi apakah Genre ada
@@ -85,10 +94,11 @@ export async function POST(req: Request) {
   });
 
   if (!genreExists) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: `Genre with ID ${genreId} not found` },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   // Upload cover image
@@ -128,5 +138,6 @@ export async function POST(req: Request) {
     },
   });
 
-  return NextResponse.json(game, { status: 201 });
+  const res = NextResponse.json(game, { status: 201 });
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }

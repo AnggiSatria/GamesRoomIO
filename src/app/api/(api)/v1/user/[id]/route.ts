@@ -1,4 +1,5 @@
 import { prisma } from "@/shared/lib/helpers/server";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -16,16 +17,22 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      const res = NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
+      return withCORS(res, _request.headers.get("origin") ?? "*");
     }
 
-    return NextResponse.json(user);
+    const res = NextResponse.json(user);
+    return withCORS(res, _request.headers.get("origin") ?? "*");
   } catch (error) {
     console.error("Error fetching user:", error);
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Failed to fetch user" },
       { status: 500 }
     );
+    return withCORS(res, _request.headers.get("origin") ?? "*");
   }
 }
 
@@ -39,7 +46,11 @@ export async function DELETE(
     const existingUser = await prisma.user.findUnique({ where: { id } });
 
     if (!existingUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      const res = NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
+      return withCORS(res, _request.headers.get("origin") ?? "*");
     }
 
     // Hapus user dan cascade ke profile jika ada
@@ -47,12 +58,14 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ message: "User deleted successfully" });
+    const res = NextResponse.json({ message: "User deleted successfully" });
+    return withCORS(res, _request.headers.get("origin") ?? "*");
   } catch (error) {
     console.error("Error deleting user:", error);
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Failed to delete user" },
       { status: 500 }
     );
+    return withCORS(res, _request.headers.get("origin") ?? "*");
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/helpers/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 // POST /reviews
 export async function POST(req: Request) {
@@ -9,10 +10,11 @@ export async function POST(req: Request) {
   const { rating, comment, gameId } = body;
 
   if (!rating || !comment || !gameId) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "All fields are required" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   const cookieStore = await cookies();
@@ -20,7 +22,8 @@ export async function POST(req: Request) {
     cookieStore.get("token")?.value ||
     req.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const res = NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   let userId: string | undefined;
@@ -31,14 +34,19 @@ export async function POST(req: Request) {
     userId = decoded.userId;
   } catch (err) {
     console.error("JWT error:", err);
-    return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    const res = NextResponse.json(
+      { message: "Invalid token" },
+      { status: 401 }
+    );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   if (!userId) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "User ID not found in token" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   try {
@@ -51,13 +59,15 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(newReview, { status: 201 });
+    const res = NextResponse.json(newReview, { status: 201 });
+    return withCORS(res, req.headers.get("origin") ?? "*");
   } catch (error) {
     console.log(error);
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }

@@ -1,3 +1,4 @@
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 import { prisma } from "@/shared/lib/helpers/server/prisma";
 import { NextResponse } from "next/server";
 
@@ -14,22 +15,35 @@ export async function GET(
       include: { game: true, createdBy: true },
     });
 
-    if (!review)
-      return NextResponse.json({ message: "Not Found" }, { status: 404 });
-    return NextResponse.json(review);
+    if (!review) {
+      const res = NextResponse.json({ message: "Not Found" }, { status: 404 });
+      return withCORS(res, req.headers.get("origin") ?? "*");
+    }
+
+    const res = NextResponse.json(review);
+    return withCORS(res, req.headers.get("origin") ?? "*");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Menangani error Prisma berdasarkan error.code, bukan Prisma.PrismaClientKnownRequestError
     if (error?.code) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      const res = NextResponse.json(
+        { message: error.message },
+        { status: 500 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
     if (error instanceof Error) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      const res = NextResponse.json(
+        { message: error.message },
+        { status: 500 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }
 
@@ -43,10 +57,11 @@ export async function PUT(
   const { rating, comment } = body;
 
   if (!rating || !comment) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Rating and comment are required" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   try {
@@ -55,23 +70,30 @@ export async function PUT(
       data: { rating, comment },
     });
 
-    return NextResponse.json(updatedReview);
+    const res = NextResponse.json(updatedReview);
+    return withCORS(res, req.headers.get("origin") ?? "*");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Menangani error Prisma berdasarkan error.code
     if (error?.code === "P2025") {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { message: "Review not found" },
         { status: 404 }
       );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
     if (error instanceof Error) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      const res = NextResponse.json(
+        { message: error.message },
+        { status: 500 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }
 
@@ -88,24 +110,31 @@ export async function DELETE(
       select: { id: true },
     });
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       message: `Review with ID ${deletedReview.id} has been successfully deleted.`,
     });
+    return withCORS(res, req.headers.get("origin") ?? "*");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Menangani error Prisma berdasarkan error.code
     if (error?.code === "P2025") {
-      return NextResponse.json(
+      const res = NextResponse.json(
         { message: "Review not found" },
         { status: 404 }
       );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
     if (error instanceof Error) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+      const res = NextResponse.json(
+        { message: error.message },
+        { status: 500 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }

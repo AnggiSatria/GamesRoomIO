@@ -1,6 +1,7 @@
 // pages/api/platforms/[id].ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/helpers/server";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 export async function PUT(req: Request) {
   const url = new URL(req.url);
@@ -8,17 +9,19 @@ export async function PUT(req: Request) {
   const { name, type } = await req.json();
 
   if (!id) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Platform ID is required" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   if (!name || !type) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Missing required fields" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   const updatedPlatform = await prisma.platform.update({
@@ -29,7 +32,8 @@ export async function PUT(req: Request) {
     },
   });
 
-  return NextResponse.json(updatedPlatform, { status: 200 }); // Kembalikan platform yang sudah diperbarui
+  const res = NextResponse.json(updatedPlatform, { status: 200 }); // Kembalikan platform yang sudah diperbarui
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }
 
 export async function GET(req: Request) {
@@ -37,10 +41,11 @@ export async function GET(req: Request) {
   const id = url.pathname.split("/").pop();
 
   if (!id) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Platform ID is required" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   const platform = await prisma.platform.findUnique({
@@ -48,13 +53,15 @@ export async function GET(req: Request) {
   });
 
   if (!platform) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Platform not found" },
       { status: 404 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
-  return NextResponse.json(platform, { status: 200 }); // Kembalikan platform yang ditemukan
+  const res = NextResponse.json(platform, { status: 200 }); // Kembalikan platform yang ditemukan
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }
 
 export async function DELETE(req: Request) {
@@ -62,10 +69,11 @@ export async function DELETE(req: Request) {
   const id = url.pathname.split("/").pop();
 
   if (!id) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Platform ID is required" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   const deletedPlatform = await prisma.platform.delete({
@@ -73,10 +81,11 @@ export async function DELETE(req: Request) {
     select: { name: true }, // hanya ambil name
   });
 
-  return NextResponse.json(
+  const res = NextResponse.json(
     {
       message: `Platform with name "${deletedPlatform.name}" has been successfully deleted.`,
     },
     { status: 200 }
   );
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }

@@ -1,6 +1,7 @@
 // /app/api/genres/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -19,5 +20,6 @@ export async function GET(req: Request) {
     take: limit,
   });
 
-  return NextResponse.json(genres);
+  const res = NextResponse.json(genres);
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }

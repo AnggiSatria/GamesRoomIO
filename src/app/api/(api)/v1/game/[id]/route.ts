@@ -3,6 +3,7 @@ import prisma from "@/shared/lib/helpers/server/prisma";
 import { v2 as cloudinary } from "cloudinary";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -26,10 +27,15 @@ export async function GET(
   });
 
   if (!game) {
-    return NextResponse.json({ message: "Game not found" }, { status: 404 });
+    const res = NextResponse.json(
+      { message: "Game not found" },
+      { status: 404 }
+    );
+    return withCORS(res, _req.headers.get("origin") ?? "*");
   }
 
-  return NextResponse.json(game);
+  const res = NextResponse.json(game);
+  return withCORS(res, _req.headers.get("origin") ?? "*");
 }
 
 // PUT
@@ -55,7 +61,8 @@ export async function PUT(
     req.headers.get("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const res = NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   let userId: string | undefined;
@@ -66,14 +73,19 @@ export async function PUT(
     userId = decoded.userId;
   } catch (err) {
     console.error("JWT error:", err);
-    return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    const res = NextResponse.json(
+      { message: "Invalid token" },
+      { status: 401 }
+    );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   if (!userId) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "User ID not found in token" },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   const missingFields: string[] = [];
@@ -84,10 +96,11 @@ export async function PUT(
   if (!platformId) missingFields.push("platformId");
 
   if (missingFields.length > 0) {
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Missing required fields", missingFields },
       { status: 400 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   let coverImageUrl: string | undefined;
@@ -129,7 +142,8 @@ export async function PUT(
     },
   });
 
-  return NextResponse.json(updatedGame);
+  const res = NextResponse.json(updatedGame);
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }
 
 // DELETE
@@ -140,5 +154,6 @@ export async function DELETE(
   const { id } = await context.params;
 
   await prisma.game.delete({ where: { id } });
-  return NextResponse.json({ message: "Game deleted successfully" });
+  const res = NextResponse.json({ message: "Game deleted successfully" });
+  return withCORS(res, _req.headers.get("origin") ?? "*");
 }

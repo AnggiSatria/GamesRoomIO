@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -31,13 +32,13 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json({
+  const res = NextResponse.json({
     data: games,
     currentPage: page,
     totalPages: Math.ceil(total / limit),
     totalItems: total,
   });
-  // return NextResponse.json(games);
+  return withCORS(res, request.headers.get("origin") ?? "*");
 }
 
 export async function POST(request: Request) {
@@ -65,5 +66,6 @@ export async function POST(request: Request) {
     },
   });
 
-  return NextResponse.json(game, { status: 201 });
+  const res = NextResponse.json(game, { status: 201 });
+  return withCORS(res, request.headers.get("origin") ?? "*");
 }

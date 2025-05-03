@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -19,5 +20,6 @@ export async function GET(req: Request) {
     take: limit,
   });
 
-  return NextResponse.json(platforms);
+  const res = NextResponse.json(platforms);
+  return withCORS(res, req.headers.get("origin") ?? "*");
 }

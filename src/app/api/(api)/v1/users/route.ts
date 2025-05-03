@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/helpers/server";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const users = await prisma.user.findMany({
       include: {
@@ -9,12 +10,14 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json({ users });
+    const res = NextResponse.json({ users });
+    return withCORS(res, req.headers.get("origin") ?? "*");
   } catch (error) {
     console.error("Error fetching users:", error);
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Failed to fetch users" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }

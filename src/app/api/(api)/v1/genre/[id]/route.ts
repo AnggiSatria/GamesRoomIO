@@ -1,6 +1,7 @@
 // /app/api/v1/genres/[id]/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
+import { withCORS } from "@/shared/lib/helpers/server/cors";
 
 // GET /genres/:id
 export async function GET(
@@ -15,16 +16,22 @@ export async function GET(
     });
 
     if (!genre) {
-      return NextResponse.json({ message: "Genre not found" }, { status: 404 });
+      const res = NextResponse.json(
+        { message: "Genre not found" },
+        { status: 404 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
 
-    return NextResponse.json(genre);
+    const res = NextResponse.json(genre);
+    return withCORS(res, req.headers.get("origin") ?? "*");
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }
 
@@ -39,7 +46,11 @@ export async function PUT(
   const { name } = body;
 
   if (!name) {
-    return NextResponse.json({ message: "Name is required" }, { status: 400 });
+    const res = NextResponse.json(
+      { message: "Name is required" },
+      { status: 400 }
+    );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 
   try {
@@ -48,18 +59,24 @@ export async function PUT(
       data: { name },
     });
 
-    return NextResponse.json(updatedGenre);
+    const res = NextResponse.json(updatedGenre);
+    return withCORS(res, req.headers.get("origin") ?? "*");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Mengatasi error yang berasal dari Prisma
     if (error?.code === "P2025") {
-      return NextResponse.json({ message: "Genre not found" }, { status: 404 });
+      const res = NextResponse.json(
+        { message: "Genre not found" },
+        { status: 404 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }
 
@@ -76,19 +93,25 @@ export async function DELETE(
       select: { name: true },
     });
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       message: `Genre "${deletedGenre.name}" has been successfully deleted.`,
     });
+    return withCORS(res, req.headers.get("origin") ?? "*");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Mengatasi error yang berasal dari Prisma
     if (error?.code === "P2025") {
-      return NextResponse.json({ message: "Genre not found" }, { status: 404 });
+      const res = NextResponse.json(
+        { message: "Genre not found" },
+        { status: 404 }
+      );
+      return withCORS(res, req.headers.get("origin") ?? "*");
     }
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
     );
+    return withCORS(res, req.headers.get("origin") ?? "*");
   }
 }
