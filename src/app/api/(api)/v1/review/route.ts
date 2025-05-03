@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/helpers/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { withCORS } from "@/shared/lib/helpers/server/cors";
+import { handleOptions, withCORS } from "@/shared/lib/helpers/server/cors";
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptions(request);
+}
 
 // POST /reviews
 export async function POST(req: Request) {

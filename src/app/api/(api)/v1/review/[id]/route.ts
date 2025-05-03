@@ -1,6 +1,10 @@
-import { withCORS } from "@/shared/lib/helpers/server/cors";
+import { handleOptions, withCORS } from "@/shared/lib/helpers/server/cors";
 import { prisma } from "@/shared/lib/helpers/server/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptions(request);
+}
 
 // GET /reviews/:id
 export async function GET(

@@ -1,15 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/helpers/server";
 import { v2 as cloudinary } from "cloudinary";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { withCORS } from "@/shared/lib/helpers/server/cors";
+import { handleOptions, withCORS } from "@/shared/lib/helpers/server/cors";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptions(request);
+}
 
 export async function POST(req: Request) {
   const formData = await req.formData();

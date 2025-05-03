@@ -1,6 +1,10 @@
 import { prisma } from "@/shared/lib/helpers/server";
-import { withCORS } from "@/shared/lib/helpers/server/cors";
-import { NextResponse } from "next/server";
+import { handleOptions, withCORS } from "@/shared/lib/helpers/server/cors";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptions(request);
+}
 
 export async function GET(
   _request: Request,

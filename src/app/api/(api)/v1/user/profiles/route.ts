@@ -1,7 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/helpers/server";
 import jwt from "jsonwebtoken";
-import { withCORS } from "@/shared/lib/helpers/server/cors";
+import { handleOptions, withCORS } from "@/shared/lib/helpers/server/cors";
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptions(request);
+}
 
 export async function GET(request: Request) {
   try {

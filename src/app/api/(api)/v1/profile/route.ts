@@ -1,7 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/shared/lib/helpers/server/prisma";
 import { getToken } from "@/shared/lib/helpers/server/auth";
-import { withCORS } from "@/shared/lib/helpers/server/cors";
+import { handleOptions, withCORS } from "@/shared/lib/helpers/server/cors";
+
+export async function OPTIONS(request: NextRequest) {
+  return handleOptions(request);
+}
 
 export async function PUT(request: Request) {
   const token = await getToken(request);
