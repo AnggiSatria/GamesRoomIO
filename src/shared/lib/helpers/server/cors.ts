@@ -19,6 +19,6 @@ export function withCORS(response: NextResponse, origin?: string) {
 
 export function handleOptions(req: NextRequest) {
   const origin = req.headers.get("origin") ?? "*";
-  const res = NextResponse.json({}, { status: 200 });
+  const res = new NextResponse(null, { status: 204 }); // kosong, tanpa body
   return withCORS(res, origin);
 }
